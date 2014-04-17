@@ -1,5 +1,6 @@
 import json
 import re
+import time
 import requests
 
 
@@ -35,9 +36,12 @@ class MSTranslate():
             raise AuthenticationFailed(result['error_description'])
         else:
             self.access_token = result['access_token']
+            self.time = time.time()
 
     def translate(self, text, toLang, fromLang=None):
-        if not self.access_token:
+        if (not self.access_token):
+            self.accessToken()
+        elif int(time.time() - self.time) > 550:
             self.accessToken()
         authToken = 'Bearer ' + self.access_token
         headers = {'Authorization': authToken}
@@ -45,7 +49,7 @@ class MSTranslate():
         result = requests.get('http://api.microsofttranslator.com/v2/Http.svc/Translate', params=params,
                               headers=headers)
         if 'Argument Exception' in result.text:
-            error=re.search(r'<p>Message:(.*?)</p>',result.text.replace('\n','')).group(1)
+            error = re.search(r'<p>Message:(.*?)</p>', result.text.replace('\n', '')).group(1)
             raise ArgumentException(error)
         else:
             return result.text[68:-9]

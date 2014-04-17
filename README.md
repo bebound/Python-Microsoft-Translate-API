@@ -14,7 +14,7 @@ Microsoft(Bing) translate API for python3
 
 ----------
 
-###Install
+###Installation
 
 	pip install mstranslate
 
